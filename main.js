@@ -6,6 +6,9 @@ import * as THREE from 'three';
 //Importation des controls
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+//Importation de ObjLoader
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+
 //creation de la scene
 const scene = new THREE.Scene();
 
@@ -30,9 +33,9 @@ const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
 const earth_texture = new THREE.TextureLoader().load('assets/earth_texture.jpg');
 const normalTexture = new THREE.TextureLoader().load('assets/earth_normal.png');
 const material = new THREE.MeshStandardMaterial({map: earth_texture, normalMap: normalTexture});
-const torus = new THREE.Mesh(geometry, material);
+const earth = new THREE.Mesh(geometry, material);
 
-scene.add(torus);
+scene.add(earth);
 
 //Creation des lights
 const pointLight = new THREE.PointLight(0xffffff);
@@ -67,13 +70,49 @@ Array(200).fill().forEach(add_stars);
 const space_texture = new THREE.TextureLoader().load('assets/space.png');
 scene.background = space_texture;
 
+
+
+//Moon Material
+const moon_texture = new THREE.TextureLoader().load('assets/moon_texture.jpg');
+const moon_normalTexture = new THREE.TextureLoader().load('assets/moon_normal.jpg');
+const moon_material = new THREE.MeshStandardMaterial({map: moon_texture, normalMap: moon_normalTexture});
+ 
+let moon;
+let moonObj;
+
+//Loading my object
+const objLoader = new OBJLoader();
+//objLoader.setMaterials([moon_material]);
+objLoader.setPath('assets/objects/');
+objLoader.load('croissant.obj', (object) => {
+  moon = new THREE.Mesh(object.children[0].geometry, moon_material);
+  moonObj = new THREE.Object3D();
+  moonObj.add(moon);
+  scene.add(moonObj);
+  moon.position.set(10, 5, 20);
+  
+  //scene.add(moon);
+});
+
+
+
 //like a game loop
 function animate() {
   requestAnimationFrame(animate);
 
-  torus.rotation.x += 0.01;
-  torus.rotation.y += 0.01;
-  torus.rotation.z += 0.01;
+  earth.rotation.x += 0.01;
+  earth.rotation.y += 0.01;
+  earth.rotation.z += 0.01;
+
+  moonObj.rotation.y += 0.01;
+ 
+
+  moon.rotation.x += 0.005;
+  moon.rotation.y += 0.005;
+  moon.rotation.z += 0.005;
+
+
+
 
   controls.update();
 
